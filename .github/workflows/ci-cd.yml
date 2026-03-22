@@ -29,7 +29,7 @@ jobs:
       # Install dependencies
       - run: npm ci
       # Run tests
-      - run: npm test -- --forceExit --if-present
+      - run: npm test --if-present
 
   # Job 2: SonarCloud code quality and security scan
   sonarcloud:
