@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  user-auth-service:
+    build:
+      context: ./user-auth-service
+    env_file:
+      - ./user-auth-service/.env
+    environment:
+      NOTIFICATION_SERVICE_URL: http://notification-service:3004
+    ports:
+      - "3001:3001"
+    depends_on:
+      - notification-service
+
+  course-catalog-service:
+    build:
+      context: ./course-catalog-service
+    env_file:
+      - ./course-catalog-service/.env
+    environment:
+      NOTIFICATION_SERVICE_URL: http://notification-service:3004
+    ports:
+      - "3002:3002"
+    depends_on:
+      - notification-service
+
+  enrollment-service:
+    build:
+      context: ./enrollment-service
+    env_file:
+      - ./enrollment-service/.env
+    environment:
+      AUTH_SERVICE_URL: http://user-auth-service:3001
+      COURSE_SERVICE_URL: http://course-catalog-service:3002
+      NOTIFICATION_SERVICE_URL: http://notification-service:3004
+    ports:
+      - "3003:3003"
+    depends_on:
+      - user-auth-service
+      - course-catalog-service
+      - notification-service
+
+  notification-service:
+    build:
+      context: ./notification-service
+    env_file:
+      - ./notification-service/.env
+    environment:
+      USER_AUTH_URL: http://user-auth-service:3001
+    ports:
+      - "3004:3004"
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    environment:
+      AUTH_SERVICE_URL: http://user-auth-service:3001
+      COURSE_SERVICE_URL: http://course-catalog-service:3002
+      ENROLLMENT_SERVICE_URL: http://enrollment-service:3003
+      NOTIFICATION_SERVICE_URL: http://notification-service:3004
+    ports:
+      - "3005:3005"
+    depends_on:
+      - user-auth-service
+      - course-catalog-service
+      - enrollment-service
+      - notification-service
