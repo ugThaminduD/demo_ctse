@@ -66,3 +66,14 @@ services:
       - course-catalog-service
       - enrollment-service
       - notification-service
+
+  frontend:
+      build:
+        context: ./frontend
+      ports:
+        - "3000:80"
+      depends_on:
+        - api-gateway
+      environment:
+        - REACT_APP_API_URL=http://api-gateway:3005
+        - REACT_APP_NOTIFICATION_URL=http://notification-service:3004
